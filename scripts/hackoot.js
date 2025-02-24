@@ -85,7 +85,7 @@ async function hackoot() {
                     clearInterval(interval);
 
                     createNotification('[HACKOOT] PROCESSANDO AUTORIZAÇÃO...', 3);
-                    
+
                     const accessTokenResponse = await fetch(`https://sch-api.vercel.app/api/utils/getToken?code=${code}&origin=${encodeURIComponent('https://kahoot.it/')}`);
                     const accessTokenJson = await accessTokenResponse.json();
 
@@ -134,7 +134,8 @@ async function hackoot() {
             4: Playing Page
             5: Correct Page
             6: Incorrect Page
-            7: Ranking Page
+            7: Slide Page
+            8: Ranking Page
     */
 
     let timerReserved;
@@ -180,46 +181,64 @@ async function hackoot() {
         setTimeout(async () => {
             try {
                 const actualPage = getActualPage();
+                if (actualPage !== 4) return;
 
-                if (actualPage === 4) {
-                    const kahootTheme = 'Conhecimentos Gerais';
-                    const kahootQuestion = filterElementsByClassSubstring('question-title')[0].textContent;
-                    const kahootOptions = filterElementsByAttributeSubstring('data-functional-selector', 'question-choice-text').map(element => element.textContent);
+                let kahootQuestion = null;
+                let kahootOptions = [];
 
-                    createNotification('[HACKOOT] QUASE LÁ...', 3);
+                // Espera até que a pergunta e as opções sejam carregadas
+                for (let attempt = 0; attempt < 10; attempt++) {
+                    kahootQuestion = filterElementsByClassSubstring('question-title')[0]?.textContent;
+                    kahootOptions = filterElementsByAttributeSubstring('data-functional-selector', 'question-choice-text')
+                        .map(element => element.textContent);
 
-                    const replyResponse = await fetch('https://sch-api.vercel.app/api/scripts/kahoot/get-answer', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            kahootTheme,
-                            kahootQuestion,
-                            kahootOptions
-                        }),
-                        headers: {
-                            'content-type': 'application/json',
-                            'authorization': localStorage.getItem('cdest-token')
-                        }
-                    });
-                    const replyJson = await replyResponse.json();
-
-                    if (replyJson.results.status !== 'success') {
-                        let errorText = replyJson.results.result === 'You aren\'t logged in with Discord' ? 'VOCÊ NÃO ESTÁ LOGADO COM O DISCORD' : replyJson.results.result === 'You aren\'t a member of Central Destroyer. https://discord.gg/centraldestroyer' ? 'VOCÊ NÃO É UM MEMBRO DA CENTRAL DESTROYER' : 'ERRO INTERNO';
-
-                        createNotification(`[HACKOOT] ERRO: ${errorText}`, 5);
-                    } else {
-                        createNotification(`[HACKOOT] A RESPOSTA É: ${replyJson.results.result.toUpperCase()}`, 5);                    
-                    }
-
-                    while (true) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        const newPage = getActualPage();
-                        if (newPage === 5 || newPage === 6) {
-                            break;
-                        }
-                    }
-
-                    timerReserved = setInterval(makeDecisions, 500);
+                    if (kahootQuestion && kahootOptions.length > 0) break;
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
+
+                if (!kahootQuestion || kahootOptions.length === 0) {
+                    createNotification('[HACKOOT] ERRO: NÃO FOI POSSÍVEL OBTER A PERGUNTA OU OPÇÕES.', 5);
+                    return;
+                }
+
+                createNotification('[HACKOOT] QUASE LÁ...', 3);
+
+                const kahootTheme = 'Conhecimentos Gerais';
+                const replyResponse = await fetch('https://sch-api.vercel.app/api/scripts/kahoot/get-answer', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        kahootTheme,
+                        kahootQuestion,
+                        kahootOptions
+                    }),
+                    headers: {
+                        'content-type': 'application/json',
+                        'authorization': localStorage.getItem('cdest-token')
+                    }
+                });
+                const replyJson = await replyResponse.json();
+
+                if (replyJson.results.status !== 'success') {
+                    let errorText = replyJson.results.result === 'You aren\'t logged in with Discord' ?
+                        'VOCÊ NÃO ESTÁ LOGADO COM O DISCORD' :
+                        replyJson.results.result === 'You aren\'t a member of Central Destroyer. https://discord.gg/centraldestroyer' ?
+                        'VOCÊ NÃO É UM MEMBRO DA CENTRAL DESTROYER' :
+                        'ERRO INTERNO';
+
+                    createNotification(`[HACKOOT] ERRO: ${errorText}`, 5);
+                } else {
+                    createNotification(`[HACKOOT] A RESPOSTA É: ${replyJson.results.result.toUpperCase()}`, 5);
+                }
+
+                while (true) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    const newPage = getActualPage();
+                    if (newPage === 5 || newPage === 6) {
+                        break;
+                    }
+                }
+
+                timerReserved = setInterval(makeDecisions, 500);
             } catch (err) {
                 console.log('[HACKOOT] ENVIE ISSO PARA OS DEVS:\n', err);
                 createNotification(`[HACKOOT] FAZ O L`, 5);
