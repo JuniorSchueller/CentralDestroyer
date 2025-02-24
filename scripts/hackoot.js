@@ -116,10 +116,12 @@ async function hackoot() {
             return 5;
         } else if (document.body.innerHTML.includes('data-functional-selector="question-index-counter"') && document.body.innerHTML.includes('>Incorreto<')) {
             return 6;
+        } else if (document.body.innerHTML.includes('data-functional-selector="question-index-counter"') && document.body.innerHTML.includes('>Slide<')) {
+            return 7;
         } else if (document.body.innerHTML.includes('data-functional-selector="question-index-counter"')) {
             return 4;
         } else if (document.body.innerHTML.includes(' pontos ·')) {
-            return 7;
+            return 8;
         }
     }
 
