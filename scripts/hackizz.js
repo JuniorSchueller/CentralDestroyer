@@ -86,7 +86,7 @@ async function hackizz() {
 
                     createNotification('[HACKIZZ] PROCESSANDO AUTORIZAÇÃO...', 3);
                     
-                    const accessTokenResponse = await fetch(`https://sch-api.vercel.app/api/utils/getToken?code=${code}&origin=${encodeURIComponent('https://quizizz.com/')}`);
+                    const accessTokenResponse = await fetch(`https://sch-api.vercel.app/api/utils/getToken?code=${code}&origin=${encodeURIComponent('https://quizizz.com/404')}`);
                     const accessTokenJson = await accessTokenResponse.json();
 
                     if (accessTokenJson.results.status !== 'success') {
