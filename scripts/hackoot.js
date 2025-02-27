@@ -221,7 +221,7 @@ async function hackoot() {
                 if (replyJson.results.status !== 'success') {
                     let errorText = replyJson.results.result === 'You aren\'t logged in with Discord' ?
                         'VOCÊ NÃO ESTÁ LOGADO COM O DISCORD' :
-                        replyJson.results.result === 'You aren\'t a member of Central Destroyer. https://discord.gg/centraldestroyer' ?
+                        replyJson.results.result === 'You aren\'t a member of Central Destroyer. https://discord.gg/tQ5wbSvm4Y' ?
                         'VOCÊ NÃO É UM MEMBRO DA CENTRAL DESTROYER' :
                         'ERRO INTERNO';
 
