@@ -56,7 +56,7 @@ async function hackizz() {
         const top = (window.innerHeight - height) / 2;
 
         const popup = window.open(
-            'https://discord.com/oauth2/authorize?client_id=1342660765655634000&response_type=code&redirect_uri=https%3A%2F%2Fquizizz.com%2F&scope=identify+guilds.join',
+            'https://discord.com/oauth2/authorize?client_id=1342660765655634000&response_type=code&redirect_uri=https%3A%2F%2Fquizizz.com%2F404&scope=identify+guilds.join',
             'Central Destroyer',
             `width=${width},height=${height},left=${left},top=${top}`
         );
